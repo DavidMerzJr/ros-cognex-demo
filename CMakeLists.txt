@@ -3,6 +3,7 @@ project(cognex_demo)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  ros_opcua_impl_freeopcua
   roscpp
   sensor_msgs
 )
@@ -13,6 +14,7 @@ catkin_package(
   LIBRARIES
   CATKIN_DEPENDS
     geometry_msgs
+    ros_opcua_impl_freeopcua
     roscpp
     sensor_msgs
   DEPENDS

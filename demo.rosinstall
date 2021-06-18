@@ -1,0 +1,10 @@
+# ROS-Install File
+
+# Drag and Bot common - dependency for Pylon ros driver
+- git: {local-name: dragandbot_common, uri: 'https://github.com/dragandbot/dragandbot_common.git', version: master}
+
+# Pylon ROS Camera - camera driver
+- git: {local-name: pylon-ros-camera, uri: 'https://github.com/basler/pylon-ros-camera.git', version: master}
+
+# ROS OpcUa Communication - opcua libraries
+- git: {local-name: ros_opcua_communication, uri: 'https://github.com/iirob/ros_opcua_communication.git', version: kinetic-devel}

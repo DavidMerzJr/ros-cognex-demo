@@ -12,9 +12,10 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>geometry_msgs</depend>
+  <depend>ros_opcua_impl_freeopcua</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
 
-  <exec_depend>pylon_camera</depend>
-  <exec_depend>rviz</depend>
+  <exec_depend>pylon_camera</exec_depend>
+  <exec_depend>rviz</exec_depend>
 </package>
