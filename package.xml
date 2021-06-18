@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>cognex_demo</name>
+  <version>0.1.0</version>
+  <description>
+    This package contains code and configuration files used to simulate a use case for a cognex camera.
+  </description>
+  <maintainer email="david.merz@swri.org">David Merz, Jr.</maintainer>
+  <license>Apache 2.0</license>
+  <author email="david.merz@swri.org">David Merz, Jr.</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+</package>
