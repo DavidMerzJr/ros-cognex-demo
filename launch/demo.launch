@@ -1,0 +1,13 @@
+<launch>
+
+  <include file="$(find pylon_camera)/launch/pylon_camera_node.launch">
+    <arg name="respawn" value="false"/>
+  </include>
+
+  <node pkg="cognex_demo" type="feature_detector_node" name="feature_detector" respawn="true"/>
+
+  <node pkg="cognex_demo" type="location_solver_node" name="location_solver" respawn="true"/>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find cognex_demo)/config/demo.rviz" required="true"/>
+
+</launch>
