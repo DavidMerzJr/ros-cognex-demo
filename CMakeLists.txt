@@ -31,6 +31,9 @@ target_link_libraries(feature_detector_node ${catkin_LIBRARIES})
 add_executable(location_solver_node src/location_solver_node.cpp)
 target_link_libraries(location_solver_node ${catkin_LIBRARIES})
 
+add_executable(plc_interface src/plc_interface.cpp)
+target_link_libraries(plc_interface ${catkin_LIBRARIES})
+
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -42,7 +45,7 @@ foreach(dir config launch)
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach()
 
-install(TARGETS feature_detector_node location_solver_node
+install(TARGETS feature_detector_node location_solver_node plc_interface
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

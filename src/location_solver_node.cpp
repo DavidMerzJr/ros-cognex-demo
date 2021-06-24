@@ -3,9 +3,9 @@
 
 void plcDataChanged(ros::Publisher& pub)
 {
-  // std::vector<std::pair<int, int>> uv_coords = getUVsFromPLC();
-  // std::vector<geometry_msgs::Pose> circle_poses = getPosesFromPLC();
-  geometry_msgs::PoseStamped pose; // = calculatePose(uv_coords, circle_poses);
+  // std::vector<std::pair<int, int>> uv_coords = getUVsFromPLC(); //Pull UVs (published by FeatureDetectorNode from PLC data block
+  // std::vector<geometry_msgs::Pose> circle_poses = getPosesFromPLC(); //Pull poses of identifying features rel. to target
+  geometry_msgs::PoseStamped pose; // = calculatePose(uv_coords, circle_poses); //solvePNP run to find target pose rel to camera
   // pushPoseToPLC(pose);
   pub.publish(pose);
   return;
