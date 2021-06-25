@@ -4,7 +4,7 @@
 #include <string>   // std::string
 #include <utility>  // std::pair
 #include <vector>   // std::vector
-
+#include <ros/ros.h>
 #include <opc/ua/client/client.h>
 #include <opc/ua/subscription.h>
 
@@ -16,6 +16,7 @@ namespace demo
 
 const static std::string OPCUA_ENDPOINT = "opc.tcp://192.168.10.8:4840";
 const static bool VERBOSE = true;
+
 /*
 // Example subscription.
 class SubscriptionCallbackDefinition : public OpcUa::SubscriptionHandler
@@ -64,15 +65,16 @@ class PLCInterface
 {
 public:
   PLCInterface();
+  PLCInterface(ros::NodeHandle& nh);
   ~PLCInterface();
   bool init(const std::string& endpoint);
   bool closeout();
 //reading tags
-  bool readTags_UV(const std::string& node_id, std::vector<std::pair<float, float>>& value);
+  bool readTag(const std::string& node_id, std::vector<std::pair<float, float>>& value);
   bool readTag(const std::string& node_id, float& value);
   bool readTag(const std::string& node_id, std::vector<geometry_msgs::Pose>& value);
 //writing tags:
-  bool writeTags_UV(const std::string& node_id, const std::vector<std::pair<float, float>> value);
+  bool writeTag(const std::string& node_id, const std::vector<std::pair<float, float>> value);
   bool writeTag(const std::string& node_id, const geometry_msgs::PoseStamped& value);
   bool writeTag(const std::string& node_id, float& value);
 

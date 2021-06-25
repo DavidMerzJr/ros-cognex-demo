@@ -1,6 +1,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <ros/ros.h>
 
+
 void plcDataChanged(ros::Publisher& pub)
 {
   // std::vector<std::pair<int, int>> uv_coords = getUVsFromPLC(); //Pull UVs (published by FeatureDetectorNode from PLC data block
@@ -17,6 +18,8 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   ros::Publisher location_pub = nh.advertise<geometry_msgs::PoseStamped>("/pose_relative_to_camera", 3);
+
+
 
   ros::Rate loop_rate(10);
   while (ros::ok())

@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   ros_opcua_impl_freeopcua
   roscpp
   sensor_msgs
+  target_finder
 )
 
 catkin_package(
@@ -17,6 +18,7 @@ catkin_package(
     ros_opcua_impl_freeopcua
     roscpp
     sensor_msgs
+    target_finder
   DEPENDS
 )
 

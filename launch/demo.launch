@@ -4,7 +4,7 @@
     <arg name="respawn" value="false"/>
   </include>
 
-  <node pkg="cognex_demo" type="feature_detector_node" name="feature_detector" respawn="true"/>
+  <node pkg="cognex_demo" type="feature_detector_node" name="feature_detector" output="screen" respawn="true"/>
 
   <node pkg="cognex_demo" type="location_solver_node" name="location_solver" respawn="true"/>
 

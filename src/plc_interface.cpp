@@ -34,7 +34,7 @@ bool PLCInterface::connect(const std::string& endpoint)
 {
   bool success = true;
   try {
-    //ROS_ERROR_STREAM("Begin connect attempt: \n");
+    ROS_INFO_STREAM("\n Begin PLC OPCUA server connect attempt: \n");
     client.Connect(endpoint);
     success=true;
   }  catch (const std::exception& ex) {
@@ -45,6 +45,10 @@ bool PLCInterface::connect(const std::string& endpoint)
     ROS_ERROR_STREAM("Error connecting to opcua server: Unknown Exception." );
     ROS_ERROR_STREAM("No connection possible! Unknown error!");
     success = false;
+  }
+  if(success)
+  {
+    ROS_INFO_STREAM("\n   PLC OPCUA server connected! \n");
   }
   return success;
 };
@@ -72,7 +76,7 @@ std::string PLCInterface::generateDimNodeID(std::string node_id, std::string dim
 {
   return node_id + ".\"" + dim + "\"";
 }
-bool PLCInterface::readTags_UV(const std::string& node_id, std::vector<std::pair<float, float>>& value)
+bool PLCInterface::readTag(const std::string& node_id, std::vector<std::pair<float, float>>& value)
 {
   //Reads the (u,v) coordinate positions of features from PLC to a list of pairs.
   bool success = true;
@@ -112,6 +116,40 @@ bool PLCInterface::readTag(const std::string& node_id, float& value)
   return success;
 
 }
+bool PLCInterface::readTag(const std::string& node_id, std::vector<geometry_msgs::Pose>& value)
+{
+  bool success = true;
+
+  for(uint i = 0; i<value.size(); i++)
+  {
+    float statx = static_cast<float>(value[i].position.x);
+    float staty = static_cast<float>(value[i].position.y);
+    float statz = static_cast<float>(value[i].position.z);
+
+    float statrw = static_cast<float>(value[i].orientation.w);
+    float statrx = static_cast<float>(value[i].orientation.x);
+    float statry = static_cast<float>(value[i].orientation.y);
+    float statrz = static_cast<float>(value[i].orientation.z);
+
+     success &=
+         PLCInterface::readTag(generateDimNodeID(node_id, "x"), statx)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "y"), staty)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "z"), statz)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "rw"), statrw)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "rx"), statrx)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "ry"), statry)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "rz"), statrz);
+    if (!success)
+    {
+      ROS_ERROR_STREAM("Failed to Read Pose at index "<< i );
+      return success;
+    }
+  }
+
+  return success;
+
+}
+
 
 bool PLCInterface::readTag(const std::string& node_id, OpcUa::Variant& value)
 {
@@ -130,7 +168,7 @@ bool PLCInterface::readTag(const std::string& node_id, OpcUa::Variant& value)
   return success;
 }
 
-bool PLCInterface::writeTags_UV(const std::string& node_id, const std::vector<std::pair<float, float>> value)
+bool PLCInterface::writeTag(const std::string& node_id, const std::vector<std::pair<float, float>> value)
 {
   //writes the (u,v) coordinate positions of features from PLC to a list of pairs.
   bool success = true;
@@ -148,7 +186,37 @@ bool PLCInterface::writeTags_UV(const std::string& node_id, const std::vector<st
   return success;
 }
 
-//bool PLCInterface::writeTag(const std::string& node_id, const geometry_msgs::PoseStamped& value);
+bool PLCInterface::writeTag(const std::string& node_id, const geometry_msgs::PoseStamped& value)
+{
+  bool success = true;
+
+  //Value contains a header with system time but that is not being used here.
+
+  float statx = static_cast<float>(value.pose.position.x);
+  float staty = static_cast<float>(value.pose.position.y);
+  float statz = static_cast<float>(value.pose.position.z);
+
+  float statrw = static_cast<float>(value.pose.orientation.w);
+  float statrx = static_cast<float>(value.pose.orientation.x);
+  float statry = static_cast<float>(value.pose.orientation.y);
+  float statrz = static_cast<float>(value.pose.orientation.z);
+
+  success &=
+      PLCInterface::writeTag(generateDimNodeID(node_id, "x"), statx)
+      && PLCInterface::writeTag(generateDimNodeID(node_id, "y"), staty)
+      && PLCInterface::writeTag(generateDimNodeID(node_id, "z"), statz)
+      && PLCInterface::writeTag(generateDimNodeID(node_id, "rw"), statrw)
+      && PLCInterface::writeTag(generateDimNodeID(node_id, "rx"), statrx)
+      && PLCInterface::writeTag(generateDimNodeID(node_id, "ry"), statry)
+      && PLCInterface::writeTag(generateDimNodeID(node_id, "rz"), statrz);
+  if (!success)
+  {
+    ROS_ERROR_STREAM("Failed to write target pose!" );
+  }
+
+  return success;
+
+}
 bool PLCInterface::writeTag(const std::string& node_id, float& value)
 {
   OpcUa::Variant var = value;
@@ -196,12 +264,16 @@ int main()
   plc.echo("PLC instantiated.\n");
 
   //test some reading
+
+
+
+  //* //test read/write UVs
   plc.echo("\nAttempting to pull UV values from "  +  plc.generateArrayNodeID(demo::node_ids::FEATURE_UV_PATH, 0, "u"));
   std::vector<std::pair<float, float>> uvs = {std::make_pair(1.1, 1.1), std::make_pair(2.2, 2.2),
                                               std::make_pair(3.3,3.3), std::make_pair(4.4,4.4)};
   std::vector<std::pair<float, float>> newuvs = {std::make_pair(1.1, 1.1), std::make_pair(2.2, 2.2),
                                               std::make_pair(3.3,3.3), std::make_pair(4.4,4.4)};
-  if(plc.readTags_UV(demo::node_ids::FEATURE_UV_PATH, uvs)){
+  if(plc.readTag(demo::node_ids::FEATURE_UV_PATH, uvs)){
     plc.echo("\nPulled values from PLC. \nOne: {"  +  std::to_string(uvs[0].first)  + ", "  + std::to_string(uvs[0].second)  +
                "}\n and two: {"  +  std::to_string(uvs[1].first)  + ", "  + std::to_string(uvs[1].second)  + "}"
                "}\n and three: {"  +  std::to_string(uvs[2].first)  + ", "  + std::to_string(uvs[2].second)  + "}"
@@ -209,20 +281,20 @@ int main()
   }else{
     plc.echo("\nFailed to get values!");
   }
-  if(plc.writeTags_UV(demo::node_ids::FEATURE_UV_PATH, newuvs))
+  if(plc.writeTag(demo::node_ids::FEATURE_UV_PATH, newuvs))
   {
     plc.echo("\nSuccessfully wrote new values for UVs! \nOne: {"  +  std::to_string(newuvs[0].first)  + ", "  + std::to_string(newuvs[0].second)  +
         "}\n and two: {"  +  std::to_string(newuvs[1].first)  + ", "  + std::to_string(newuvs[1].second)  + "}"
         "}\n and three: {"  +  std::to_string(newuvs[2].first)  + ", "  + std::to_string(newuvs[2].second)  + "}"
         "}\n and four: {"  +  std::to_string(newuvs[3].first)  + ", "  + std::to_string(newuvs[3].second)  + "}");
   }
-  if(plc.writeTags_UV(demo::node_ids::FEATURE_UV_PATH, uvs))
+  if(plc.writeTag(demo::node_ids::FEATURE_UV_PATH, uvs))
   {
     plc.echo("\nWrote old values back: \nOne: {"  +  std::to_string(uvs[0].first)  + ", "  + std::to_string(uvs[0].second)  +
                "}\n and two: {"  +  std::to_string(uvs[1].first)  + ", "  + std::to_string(uvs[1].second)  + "}"
                "}\n and three: {"  +  std::to_string(uvs[2].first)  + ", "  + std::to_string(uvs[2].second)  + "}"
                "}\n and four: {"  +  std::to_string(uvs[3].first)  + ", "  + std::to_string(uvs[3].second)  + "}");
-  }
+  }/*/
 
   //test some writing:
   /*plc.echo("\n Test writing to OPCUA node: \n " );
@@ -246,7 +318,7 @@ int main()
 
   if(plc.closeout())
   {
-    plc.echo("PLC disconnected.\n");
+    plc.echo("\n PLC disconnected.\n");
   }
   return 0;
 }
