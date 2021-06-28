@@ -21,13 +21,13 @@ public:
   FeatureDetector(ros::NodeHandle& nh)
     : nh_ (nh)
   {
-    image_sub_ = nh.subscribe("pylon_camera_node/image_raw", 5, &FeatureDetector::imageCallback, this);
+    image_sub_ = nh.subscribe("/pylon_camera_node/image_raw", 5, &FeatureDetector::imageCallback, this);
     return;
   }
 
   void imageCallback(const sensor_msgs::Image::ConstPtr& image)
   {
-    std::vector<std::pair<float, float>> uv_coords; // = findCircles(image);
+    std::vector<std::pair<float, float>> uv_coords(20); // = findCircles(image);
     plci_.writeTag(node_ids::FEATURE_UV_PATH, uv_coords);
     return;
   }
