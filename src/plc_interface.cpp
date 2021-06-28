@@ -152,7 +152,6 @@ bool PLCInterface::readTag(const std::string& node_id, std::vector<geometry_msgs
   }
 
   return success;
-
 }
 
 bool PLCInterface::readTag(const std::string& node_id, OpcUa::Variant& value)

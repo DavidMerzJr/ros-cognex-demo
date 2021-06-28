@@ -33,7 +33,7 @@ class SubscriptionCallbackDefinition : public OpcUa::SubscriptionHandler
 // On instantiation
 SubscriptionCallbackDefinition sub_def;
 int i = 1; // Not sure what this does yet.
-std::shared_ptr<OpcUa::Subscription> sub = client_.CreateSubscription(i, sub_def);
+std::shared_ptr<OpcUa::Subscription> sub = client.CreateSubscription(i, sub_def);
 
 // To subscribe
 std::string node_id = "NAME"; // obviously this changes from case to case.

@@ -6,7 +6,7 @@
 
   <node pkg="cognex_demo" type="feature_detector_node" name="feature_detector" output="screen" respawn="true"/>
 
-  <node pkg="cognex_demo" type="location_solver_node" name="location_solver" respawn="true"/>
+  <node pkg="cognex_demo" type="location_solver_node" name="location_solver" output="screen" respawn="true"/>
 
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find cognex_demo)/config/demo.rviz" required="true"/>
 
