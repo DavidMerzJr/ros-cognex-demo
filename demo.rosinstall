@@ -8,3 +8,9 @@
 
 # ROS OpcUa Communication - opcua libraries
 - git: {local-name: ros_opcua_communication, uri: 'https://github.com/iirob/ros_opcua_communication.git', version: kinetic-devel}
+
+# Industrial Calibration
+- git: {local-name: industrial_calibration, uri: 'https://github.com/ros-industrial/industrial_calibration.git', version: noetic-devel}
+
+# Intelligent Actuator (Calibration dependency)
+- git: {local-name: intelligent_actuator, uri: 'https://github.com/ros-industrial/intelligent_actuator.git', version: master}

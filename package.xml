@@ -8,6 +8,7 @@
   <maintainer email="david.merz@swri.org">David Merz, Jr.</maintainer>
   <license>Apache 2.0</license>
   <author email="david.merz@swri.org">David Merz, Jr.</author>
+  <author email="john.bonnin@swri.org">John Bonnin</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -15,6 +16,7 @@
   <depend>ros_opcua_impl_freeopcua</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>target_finder</depend>
 
   <exec_depend>pylon_camera</exec_depend>
   <exec_depend>rviz</exec_depend>

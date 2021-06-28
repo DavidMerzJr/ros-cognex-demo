@@ -1,6 +1,6 @@
 #include <cognex_demo/plc_interface.h>
+
 #include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
 
 
 namespace demo
@@ -8,87 +8,90 @@ namespace demo
 
 PLCInterface::PLCInterface()
 {
-  init(OPCUA_ENDPOINT);
+  connect(OPCUA_ENDPOINT);
   return;
-};
+}
+
 PLCInterface::~PLCInterface()
 {
   disconnect();
   return;
-};
+}
 
-bool PLCInterface::init(const std::string& endpoint = OPCUA_ENDPOINT)
+bool PLCInterface::connect(const std::string& endpoint = OPCUA_ENDPOINT)
 {
   bool success = true;
-  success &= connect(endpoint);
-  return success;
-};
-bool PLCInterface::closeout()
-{
-  bool success = true;
-  success &= disconnect();
-  return success;
-};
-
-bool PLCInterface::connect(const std::string& endpoint)
-{
-  bool success = true;
-  try {
-    ROS_INFO_STREAM("\n Begin PLC OPCUA server connect attempt: \n");
+  try
+  {
+    ROS_INFO_STREAM("Begin PLC OPCUA server connect attempt.");
     client.Connect(endpoint);
-    success=true;
-  }  catch (const std::exception& ex) {
+    success = true;
+  }
+  catch (const std::exception& ex)
+  {
     ROS_ERROR_STREAM("Error connecting to opcua server: " << ex.what()  );
     ROS_ERROR_STREAM("No connection possible!");
     success = false;
-  } catch (...){
+  }
+  catch (...)
+  {
     ROS_ERROR_STREAM("Error connecting to opcua server: Unknown Exception." );
     ROS_ERROR_STREAM("No connection possible! Unknown error!");
     success = false;
   }
-  if(success)
+
+  if (success)
   {
-    ROS_INFO_STREAM("\n   PLC OPCUA server connected! \n");
+    ROS_INFO_STREAM("PLC OPCUA server connected!");
   }
   return success;
-};
+}
+
 bool PLCInterface::disconnect()
 {
   bool success = true;
-  try {
+  try
+  {
     client.Disconnect();
-    success=true;
-  }  catch (const std::exception& ex) {
+    success = true;
+  }
+  catch (const std::exception& ex)
+  {
     ROS_ERROR_STREAM("Error disconnecting from opcua server: "<< ex.what());
     success = false;
-  } catch (...){
+  }
+  catch (...)
+  {
     ROS_ERROR_STREAM("Error disconnecting from opcua server: Unknown Exception." );
     success = false;
   }
   return success;
-};
+}
 
-std::string PLCInterface::generateArrayNodeID(const std::string& node_id, uint index, std::string dim)
+std::string PLCInterface::generateArrayNodeID(const std::string& node_id, const uint index, const std::string& dim)
 {
   return node_id + std::to_string(index) + "].\"" + dim + "\"";
 }
-std::string PLCInterface::generateDimNodeID(std::string node_id, std::string dim)
+
+std::string PLCInterface::generateDimNodeID(const std::string& node_id, const std::string& dim)
 {
   return node_id + ".\"" + dim + "\"";
 }
+
 bool PLCInterface::readTag(const std::string& node_id, std::vector<std::pair<float, float>>& value)
 {
   //Reads the (u,v) coordinate positions of features from PLC to a list of pairs.
   bool success = true;
 
-  for(uint i = 0; i< value.size(); i++) {
-    if(!PLCInterface::readTag(generateArrayNodeID(node_id, i, "u"), value[i].first))
+  for (uint i = 0; i < value.size() && success; ++i)
+  {
+    if (!readTag(generateArrayNodeID(node_id, i, "u"), value[i].first))
     {
-      success=false;
+      success = false;
     }
-    if(!PLCInterface::readTag(generateArrayNodeID(node_id, i, "v"), value[i].second))
+    if (!readTag(generateArrayNodeID(node_id, i, "v"), value[i].second))
     {
-      success=false;
+      success = false;
     }
   }
   return success;
@@ -98,51 +101,53 @@ bool PLCInterface::readTag(const std::string& node_id, float& value)
 {
   bool success = true;
   OpcUa::Variant opcua_value;
-  if(!PLCInterface::readTag(node_id, opcua_value))
+  if (!readTag(node_id, opcua_value))
   {
     return false;
   }
-  if(static_cast<int>(opcua_value.Type()) == 10)//float32
+  if (static_cast<int>(opcua_value.Type()) == 10) //float32
   {
     value = static_cast<float>(opcua_value);
-  }else if(static_cast<int>(opcua_value.Type()) == 11)//float64
+  }
+  else if (static_cast<int>(opcua_value.Type()) == 11)  //float64
   {
     value = static_cast<float>(opcua_value);
-  }else {
+  }
+  else
+  {
     success = false;
-    ROS_ERROR_STREAM("Error reading opcua nodeID'"  +  node_id  + "'. Node holds wrong data type." );
+    ROS_ERROR_STREAM("Error reading opcua nodeID'" + node_id + "'. Node holds wrong data type.");
   }
 
   return success;
-
 }
+
+bool PLCInterface::readTag(const std::string& node_id, double& value)
+{
+  float fvalue = 0.0;
+  bool success = readTag(node_id, fvalue);
+  value = static_cast<double>(fvalue);
+  return success;
+}
+
 bool PLCInterface::readTag(const std::string& node_id, std::vector<geometry_msgs::Pose>& value)
 {
   bool success = true;
 
-  for(uint i = 0; i<value.size(); i++)
+  for (uint i = 0; i < value.size() && success; ++i)
   {
-    float statx = static_cast<float>(value[i].position.x);
-    float staty = static_cast<float>(value[i].position.y);
-    float statz = static_cast<float>(value[i].position.z);
+    success &=
+        PLCInterface::readTag(generateDimNodeID(node_id, "x"), value[i].position.x)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "y"), value[i].position.y)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "z"), value[i].position.z)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "rw"), value[i].orientation.w)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "rx"), value[i].orientation.x)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "ry"), value[i].orientation.y)
+        && PLCInterface::readTag(generateDimNodeID(node_id, "rz"), value[i].orientation.z);
 
-    float statrw = static_cast<float>(value[i].orientation.w);
-    float statrx = static_cast<float>(value[i].orientation.x);
-    float statry = static_cast<float>(value[i].orientation.y);
-    float statrz = static_cast<float>(value[i].orientation.z);
-
-     success &=
-         PLCInterface::readTag(generateDimNodeID(node_id, "x"), statx)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "y"), staty)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "z"), statz)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "rw"), statrw)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "rx"), statrx)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "ry"), statry)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "rz"), statrz);
     if (!success)
     {
       ROS_ERROR_STREAM("Failed to Read Pose at index "<< i );
-      return success;
     }
   }
 
@@ -150,18 +155,22 @@ bool PLCInterface::readTag(const std::string& node_id, std::vector<geometry_msgs
 
 }
 
-
 bool PLCInterface::readTag(const std::string& node_id, OpcUa::Variant& value)
 {
   bool success = false;
-  try {
+  try
+  {
     OpcUa::Node node = client.GetNode(node_id);
     value = static_cast<float>(node.GetValue());
     success = true;
-  } catch (const std::exception& ex) {
+  }
+  catch (const std::exception& ex)
+  {
     ROS_ERROR_STREAM("Error reading opcua nodeID'"  +  node_id  + "' Error: "  + ex.what());
     success = false;
-  } catch (...){
+  }
+  catch (...)
+  {
     ROS_ERROR_STREAM("Error reading opcua nodeID'"  +  node_id  + "'. Unknown Exception." );
     success = false;
   }
@@ -173,14 +182,14 @@ bool PLCInterface::writeTag(const std::string& node_id, const std::vector<std::p
   //writes the (u,v) coordinate positions of features from PLC to a list of pairs.
   bool success = true;
 
-  for(uint i = 0; i< value.size(); i++) {
+  for(uint i = 0; i < value.size(); i++) {
     if(!PLCInterface::writeTag(generateArrayNodeID(node_id, i, "u"), value[i].first))
     {
-      success=false;
+      success = false;
     }
     if(!PLCInterface::writeTag(generateArrayNodeID(node_id, i, "v"), value[i].second))
     {
-      success=false;
+      success = false;
     }
   }
   return success;
@@ -190,7 +199,7 @@ bool PLCInterface::writeTag(const std::string& node_id, const geometry_msgs::Pos
 {
   bool success = true;
 
-  //Value contains a header with system time but that is not being used here.
+  // Value contains a header with system time but that is not being used here.
 
   float statx = static_cast<float>(value.pose.position.x);
   float staty = static_cast<float>(value.pose.position.y);
@@ -215,28 +224,33 @@ bool PLCInterface::writeTag(const std::string& node_id, const geometry_msgs::Pos
   }
 
   return success;
-
 }
+
 bool PLCInterface::writeTag(const std::string& node_id, float& value)
 {
   OpcUa::Variant var = value;
   return writeTag(node_id, var);
 }
+
 bool PLCInterface::writeTag(const std::string& node_id, const OpcUa::Variant& value)
 {
   bool success = false;
 
-  if(value.IsNul())
+  if (value.IsNul())
   {
     ROS_ERROR_STREAM("Cannot write null value.");
     return false;
-  }else
+  }
+  else
   {
-    try {
+    try
+    {
       OpcUa::Node node = client.GetNode(node_id);
-      node.SetValue(value);// = static_cast<float>(node.GetValue());
+      node.SetValue(value); // = static_cast<float>(node.GetValue());
       success = true;
-    } catch (const std::exception& ex) {
+    }
+    catch (const std::exception& ex)
+    {
       ROS_ERROR_STREAM("Error pulling node value: '" + node_id + "' error: " + ex.what());
     }
     catch(...)
@@ -246,26 +260,16 @@ bool PLCInterface::writeTag(const std::string& node_id, const OpcUa::Variant& va
   }
   return success;
 }
-void PLCInterface::echo(std::string out){
-  //Only print debug lines when VERBOSE is set in header file
-  if (VERBOSE){
-    std::cout<<out;
-  }
-  else {
-    //ROS_ERROR_STREAM(out);
-  }
-}
+
 } // namespace demo
 
-
+/*  This file defines a class, and should be built as a library
 int main()
 {
   demo::PLCInterface plc;
   plc.echo("PLC instantiated.\n");
 
-  //test some reading
-
-
+  // test some reading
 
   //* //test read/write UVs
   plc.echo("\nAttempting to pull UV values from "  +  plc.generateArrayNodeID(demo::node_ids::FEATURE_UV_PATH, 0, "u"));
@@ -294,7 +298,7 @@ int main()
                "}\n and two: {"  +  std::to_string(uvs[1].first)  + ", "  + std::to_string(uvs[1].second)  + "}"
                "}\n and three: {"  +  std::to_string(uvs[2].first)  + ", "  + std::to_string(uvs[2].second)  + "}"
                "}\n and four: {"  +  std::to_string(uvs[3].first)  + ", "  + std::to_string(uvs[3].second)  + "}");
-  }/*/
+  }
 
   //test some writing:
   /*plc.echo("\n Test writing to OPCUA node: \n " );
@@ -314,11 +318,8 @@ int main()
 
       }
     }
-  }*/
-
-  if(plc.closeout())
-  {
-    plc.echo("\n PLC disconnected.\n");
   }
+
   return 0;
 }
+*/

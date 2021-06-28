@@ -27,14 +27,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(plc_interface src/plc_interface.cpp)
+target_link_libraries(plc_interface ${catkin_LIBRARIES})
+
 add_executable(feature_detector_node src/feature_detector_node.cpp)
 target_link_libraries(feature_detector_node ${catkin_LIBRARIES})
 
 add_executable(location_solver_node src/location_solver_node.cpp)
 target_link_libraries(location_solver_node ${catkin_LIBRARIES})
-
-add_executable(plc_interface src/plc_interface.cpp)
-target_link_libraries(plc_interface ${catkin_LIBRARIES})
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
