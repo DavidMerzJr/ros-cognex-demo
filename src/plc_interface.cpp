@@ -137,13 +137,13 @@ bool PLCInterface::readTag(const std::string& node_id, std::vector<geometry_msgs
   for (uint i = 0; i < value.size() && success; ++i)
   {
     success &=
-        PLCInterface::readTag(generateDimNodeID(node_id, "x"), value[i].position.x)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "y"), value[i].position.y)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "z"), value[i].position.z)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "rw"), value[i].orientation.w)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "rx"), value[i].orientation.x)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "ry"), value[i].orientation.y)
-        && PLCInterface::readTag(generateDimNodeID(node_id, "rz"), value[i].orientation.z);
+        PLCInterface::readTag(generateArrayNodeID(node_id, i, "x"), value[i].position.x)
+        && PLCInterface::readTag(generateArrayNodeID(node_id, i, "y"), value[i].position.y)
+        && PLCInterface::readTag(generateArrayNodeID(node_id, i, "z"), value[i].position.z)
+        && PLCInterface::readTag(generateArrayNodeID(node_id, i, "rw"), value[i].orientation.w)
+        && PLCInterface::readTag(generateArrayNodeID(node_id, i, "rx"), value[i].orientation.x)
+        && PLCInterface::readTag(generateArrayNodeID(node_id, i, "ry"), value[i].orientation.y)
+        && PLCInterface::readTag(generateArrayNodeID(node_id, i, "rz"), value[i].orientation.z);
 
     if (!success)
     {
