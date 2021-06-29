@@ -1,10 +1,22 @@
-#include <geometry_msgs/PoseStamped.h>
-#include <opencv2/calib3d.hpp>
-#include <opencv2/core/types.hpp>
-#include <ros/ros.h>
-#include <sensor_msgs/CameraInfo.h>
+#include <memory>   // std::shared_ptr
+#include <string>   // std::string
+#include <utility>  // std::pair
+#include <vector>   // std::vector
+
+#include <opc/ua/node.h>                    // OpcUa::Node
+#include <opc/ua/protocol/variant.h>        // OpcUa::Variant
+#include <opc/ua/protocol/attribute_ids.h>  // OpcUa::AttributeId
+#include <opc/ua/subscription.h>            // OpcUa::Subscription, OpcUa::SubscriptionHandler
+#include <opencv2/calib3d.hpp>              // cv::Rodrigues(), cv::solvePnP()
+#include <opencv2/core/mat.hpp>             // cv::Mat
+#include <opencv2/core/types.hpp>           // cv::Point2d, cv::Point3d
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
+
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
 
 #include <cognex_demo/plc_interface.h>
 
@@ -186,6 +198,7 @@ public:
 
         // Convert solution back to ROS types
         geometry_msgs::PoseStamped pose = toROS(rotation_vec, translation_vec);
+        pose.header.frame_id = "map";
 
         // Send it to the PLC
         ls_->plci_.writeTag(node_ids::TARGET_POSE, pose);

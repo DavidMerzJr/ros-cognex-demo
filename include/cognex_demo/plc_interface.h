@@ -5,12 +5,11 @@
 #include <utility>  // std::pair
 #include <vector>   // std::vector
 
-#include <opc/ua/client/client.h>
-#include <opc/ua/subscription.h>
+#include <opc/ua/client/client.h>     // OpcUa::UaClient
+#include <opc/ua/protocol/variant.h>  // OpcUa::Variant
 
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <ros/ros.h>
 
 namespace demo
 {
@@ -19,6 +18,11 @@ const static std::string OPCUA_ENDPOINT = "opc.tcp://192.168.10.8:4840";
 
 /*
 // Example subscription.
+
+// include the header
+#include <opc/ua/subscription.h>
+
+// define a class
 class SubscriptionCallbackDefinition : public OpcUa::SubscriptionHandler
 {
   void DataChange(uint32_t handle,

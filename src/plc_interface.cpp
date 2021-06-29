@@ -1,7 +1,8 @@
 #include <cognex_demo/plc_interface.h>
 
-#include <ros/ros.h>
+#include <exception>  // std::exception
 
+#include <ros/console.h>
 
 namespace demo
 {
@@ -23,26 +24,24 @@ bool PLCInterface::connect(const std::string& endpoint = OPCUA_ENDPOINT)
   bool success = true;
   try
   {
-    ROS_INFO_STREAM("Begin PLC OPCUA server connect attempt.");
+    ROS_DEBUG_STREAM("Begin PLC OPCUA server connect attempt.");
     client.Connect(endpoint);
     success = true;
   }
   catch (const std::exception& ex)
   {
     ROS_ERROR_STREAM("Error connecting to opcua server: " << ex.what()  );
-    ROS_ERROR_STREAM("No connection possible!");
     success = false;
   }
   catch (...)
   {
     ROS_ERROR_STREAM("Error connecting to opcua server: Unknown Exception." );
-    ROS_ERROR_STREAM("No connection possible! Unknown error!");
     success = false;
   }
 
   if (success)
   {
-    ROS_INFO_STREAM("PLC OPCUA server connected!");
+    ROS_DEBUG_STREAM("PLC OPCUA server connected!");
   }
   return success;
 }

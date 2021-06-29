@@ -3,6 +3,7 @@ project(cognex_demo)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  industrial_extrinsic_cal
   ros_opcua_impl_freeopcua
   roscpp
   sensor_msgs
