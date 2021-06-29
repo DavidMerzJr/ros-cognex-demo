@@ -20,10 +20,10 @@
 
   <!-- <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="dynamic_reconfigure"/> -->
 
-  <param name="pointcloud_file" value="$(find ros_cognex_demo)/support/plane_window.ply"/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_plane" args="0 0 1.0 0 0.707 0.707 0 map plane" respawn="true"/>
+
+  <param name="pointcloud_file" value="$(find cognex_demo)/support/plane_window.ply"/>
   <param name="pointcloud_frame" value="plane"/>
   <node pkg="cognex_demo" type="pointcloud_publisher" name="pointcloud_publisher"/>
-
-  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_plane" args="0 0 1.0 0.707 0 0 0.707 map plane" respawn="true"/>
 
 </launch>

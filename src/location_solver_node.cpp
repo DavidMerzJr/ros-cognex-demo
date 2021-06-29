@@ -12,6 +12,7 @@
 #include <opencv2/core/types.hpp>           // cv::Point2d, cv::Point3d
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
 
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -70,6 +71,40 @@ geometry_msgs::PoseStamped toROS(const cv::Mat& rotation_vec, const cv::Mat& tra
   p.pose.position.x = translation_vec.at<double>(0);
   p.pose.position.y = translation_vec.at<double>(1);
   p.pose.position.z = translation_vec.at<double>(2);
+  p.pose.orientation.w = q.getW();
+  p.pose.orientation.x = q.getX();
+  p.pose.orientation.y = q.getY();
+  p.pose.orientation.z = q.getZ();
+
+  return p;
+}
+
+tf2::Transform toTF2(const geometry_msgs::PoseStamped& pose)
+{
+  tf2::Vector3 v (
+        pose.pose.position.x,
+        pose.pose.position.y,
+        pose.pose.position.z);
+  tf2::Quaternion q (
+        pose.pose.orientation.x,
+        pose.pose.orientation.y,
+        pose.pose.orientation.z,
+        pose.pose.orientation.w);
+  tf2::Transform tf (q, v);
+  return tf;
+}
+
+geometry_msgs::PoseStamped reversePose(const geometry_msgs::PoseStamped& pose)
+{
+  tf2::Transform tf = toTF2(pose);
+  tf = tf.inverse();
+  tf2::Quaternion q = tf.getRotation();
+  tf2::Vector3 v = tf.getOrigin();
+
+  geometry_msgs::PoseStamped p;
+  p.pose.position.x = v.getX();
+  p.pose.position.y = v.getY();
+  p.pose.position.z = v.getZ();
   p.pose.orientation.w = q.getW();
   p.pose.orientation.x = q.getX();
   p.pose.orientation.y = q.getY();
@@ -198,12 +233,13 @@ public:
 
         // Convert solution back to ROS types
         geometry_msgs::PoseStamped pose = toROS(rotation_vec, translation_vec);
-        pose.header.frame_id = "map";
 
         // Send it to the PLC
         ls_->plci_.writeTag(node_ids::TARGET_POSE, pose);
 
         // Send it to RViz
+        pose = reversePose(pose);
+        pose.header.frame_id = "plane";
         ls_->location_pub_.publish(pose);
       }
 
