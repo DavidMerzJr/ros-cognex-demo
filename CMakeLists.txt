@@ -4,6 +4,7 @@ project(cognex_demo)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   industrial_extrinsic_cal
+  pcl_ros
   ros_opcua_impl_freeopcua
   roscpp
   sensor_msgs
@@ -12,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(OpenCV REQUIRED)
+find_package(PCL REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS
@@ -19,6 +21,7 @@ catkin_package(
   LIBRARIES
   CATKIN_DEPENDS
     geometry_msgs
+    pcl_ros
     ros_opcua_impl_freeopcua
     roscpp
     sensor_msgs
@@ -32,10 +35,13 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
 )
 
 add_library(plc_interface src/plc_interface.cpp)
-target_link_libraries(plc_interface ${catkin_LIBRARIES})
+target_link_libraries(plc_interface
+  ${catkin_LIBRARIES}
+)
 
 add_executable(feature_detector_node src/feature_detector_node.cpp)
 target_link_libraries(feature_detector_node
@@ -50,18 +56,28 @@ target_link_libraries(location_solver_node
   ${OpenCV_LIBRARIES}
 )
 
+add_executable(pointcloud_publisher src/pointcloud_publisher.cpp)
+target_link_libraries(pointcloud_publisher
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
 )
 
-foreach(dir config launch)
+foreach(dir config launch support)
   install(DIRECTORY ${dir}/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach()
 
-install(TARGETS feature_detector_node location_solver_node plc_interface
+install(TARGETS
+    feature_detector_node
+    location_solver_node
+    plc_interface
+    pointcloud_publisher
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

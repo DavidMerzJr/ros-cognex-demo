@@ -13,6 +13,8 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>geometry_msgs</depend>
+  <depend>industrial_extrinsic_cal</depend>
+  <depend>pcl_ros</depend>
   <depend>ros_opcua_impl_freeopcua</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
@@ -21,4 +23,5 @@
 
   <exec_depend>pylon_camera</exec_depend>
   <exec_depend>rviz</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
 </package>
