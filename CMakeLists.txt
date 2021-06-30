@@ -56,6 +56,12 @@ target_link_libraries(location_solver_node
   ${OpenCV_LIBRARIES}
 )
 
+add_executable(plc_initializer src/plc_initializer.cpp)
+target_link_libraries(plc_initializer
+  plc_interface
+  ${catkin_LIBRARIES}
+)
+
 add_executable(pointcloud_publisher src/pointcloud_publisher.cpp)
 target_link_libraries(pointcloud_publisher
   ${catkin_LIBRARIES}
@@ -76,6 +82,7 @@ endforeach()
 install(TARGETS
     feature_detector_node
     location_solver_node
+    plc_initializer
     plc_interface
     pointcloud_publisher
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

@@ -17,7 +17,6 @@ int main(int argc, char **argv)
   std::string filename, frame;
   nh.getParam("pointcloud_file", filename);
   nh.getParam("pointcloud_frame", frame);
-  ROS_ERROR_STREAM(filename << " " << frame);
 
   // Load the pointcloud
   pcl::PointCloud<pcl::PointXYZRGB> cloud;
