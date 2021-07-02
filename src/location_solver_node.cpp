@@ -128,7 +128,7 @@ public:
     // Load the camera intrinsics from the camera_info topic
     double fx, fy, cx, cy, k1, k2, k3, p1, p2;
     camera_matrix_ = cv::Mat(3, 3, CV_64F);
-    const sensor_msgs::CameraInfo::ConstPtr& info_msg =
+    const sensor_msgs::CameraInfo::ConstPtr info_msg =
         ros::topic::waitForMessage<sensor_msgs::CameraInfo>(camera_info_topic);
     if (info_msg == nullptr || info_msg->K[0] == 0.0)
     {
