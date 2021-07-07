@@ -33,14 +33,15 @@ int main(int argc, char **argv)
   // Make a publisher
   ros::Publisher pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB>>("point_cloud", 1, true);
 
-  // Re-publish occasionally in case the frame moves
-  ros::Rate loop_rate(0.1);
-  while (ros::ok())
-  {
-    pub.publish(cloud);
-    ros::spinOnce();
-    loop_rate.sleep();
-  }
+  //  // Re-publish occasionally in case the frame moves
+  //  ros::Rate loop_rate(0.01);
+  //  while (ros::ok())
+  //  {
+  pub.publish(cloud);
+  //    ros::spinOnce();
+  //    loop_rate.sleep();
+  //  }
 
+  ros::spin();
   return 0;
 }

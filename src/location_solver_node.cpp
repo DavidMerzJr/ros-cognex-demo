@@ -158,6 +158,11 @@ public:
       camera_matrix_.at<double>(2, 2) = 1.0;
     }
 
+    // Pull poses of identifying features rel. to target, as defined in PLC
+    std::vector<geometry_msgs::Pose> circle_poses (20);
+    plci_.readTag(node_ids::FEATURE_TF_PATH, circle_poses);
+    xyz_pts_ = toCV(circle_poses);
+
     // Create a publisher to display the calculated target pose in RViz
     location_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/pose_relative_to_camera", 3);
 
@@ -206,25 +211,19 @@ public:
     {
       if (ls_ != nullptr)
       {
-
         // Pull UVs (pushed by FeatureDetectorNode to PLC data block)
         std::vector<std::pair<float, float>> uv_coords (20);
         ls_->plci_.readTag(node_ids::FEATURE_UV_PATH, uv_coords);
 
-        // Pull poses of identifying features rel. to target, as defined in PLC
-        std::vector<geometry_msgs::Pose> circle_poses (20);
-        ls_->plci_.readTag(node_ids::FEATURE_TF_PATH, circle_poses);
-
-        // Convert uv and pose to opencv types
+        // Convert uv to opencv types
         std::vector<cv::Point2d> uv_pts = toCV(uv_coords);
-        std::vector<cv::Point3d> xyz_pts = toCV(circle_poses);
 
         // Solve the target pose
         cv::Mat distortion_coefficients;                  // leave as zero, see what happens
         cv::Mat rotation_vec = cv::Mat(3, 1, CV_64F);     // output parameter
         cv::Mat translation_vec = cv::Mat(3, 1, CV_64F);  // output parameter
         cv::solvePnP(
-              xyz_pts,
+              ls_->xyz_pts_,
               uv_pts,
               ls_->camera_matrix_,
               distortion_coefficients,
@@ -260,6 +259,8 @@ private:
   SubscriptionCallbackDefinition sub_def;
   std::shared_ptr<OpcUa::Subscription> sub;
   uint32_t subscription_handle;
+
+  std::vector<cv::Point3d> xyz_pts_;
 
 };  // class LocationSolver
 
