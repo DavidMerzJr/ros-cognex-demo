@@ -1,9 +1,13 @@
 <launch>
-
   <include file="$(find pylon_camera)/launch/pylon_camera_node.launch">
     <arg name="respawn" value="false"/>
     <arg name="config_file" value="$(find industrial_extrinsic_cal)/config/ACA1920_25gc.yaml"/>
   </include>
+
+<!-- Uncomment these lines if using a custom camera interface that does not publish the camera intrinsics
+  <rosparam command="load" ns="/camera_info" file="$(find cognex_demo)/config/camera_intrinsics.yaml"/>
+  <node pkg="cognex_demo" type="camera_info_publisher_node" name="cam_info_pub"/>
+-->
 
   <node pkg="cognex_demo" type="feature_detector_node" name="feature_detector" respawn="true">
     <param name="white_blobs" value="false"/>
@@ -17,13 +21,10 @@
   <node pkg="cognex_demo" type="location_solver_node" name="location_solver" respawn="true"/>
 
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find cognex_demo)/config/demo.rviz" required="true"/>
-
   <!-- <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="dynamic_reconfigure"/> -->
-
   <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_plane" args="0 0 1.0 0 0.707 0.707 0 map plane" respawn="true"/>
 
   <param name="pointcloud_file" value="$(find cognex_demo)/support/plane_window.ply"/>
   <param name="pointcloud_frame" value="plane"/>
   <node pkg="cognex_demo" type="pointcloud_publisher" name="pointcloud_publisher"/>
-
 </launch>

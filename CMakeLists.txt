@@ -43,6 +43,11 @@ target_link_libraries(plc_interface
   ${catkin_LIBRARIES}
 )
 
+add_executable(camera_info_publisher_node src/camera_info_publisher_node.cpp)
+target_link_libraries(camera_info_publisher_node
+  ${catkin_LIBRARIES}
+)
+
 add_executable(feature_detector_node src/feature_detector_node.cpp)
 target_link_libraries(feature_detector_node
   ${catkin_LIBRARIES}
@@ -80,6 +85,7 @@ foreach(dir config launch support)
 endforeach()
 
 install(TARGETS
+    camera_info_publisher_node
     feature_detector_node
     location_solver_node
     plc_initializer
